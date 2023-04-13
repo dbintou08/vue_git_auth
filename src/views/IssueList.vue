@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>issueリスト</h1>
+    <h1>issueList</h1>
     <el-button type="success" @click="getIssues()">issue取得</el-button>
     <el-row :gutter="12">
       <el-col :span="12" v-for="issue in issues" :key="issue.id">
@@ -22,43 +22,40 @@
 import axios from 'axios';
 
 const client = axios.create({
-  // 環境変数に変更
-  baseURL: `${process.env.VUE_APP_GITHUB_ENDPOINT}`, 
-  headers: {
-    'Accept': 'application/vnd.github.v3+json',
-    'Content-Type':'application/json',
-    // 環境変数に変更
-    'Authorization': `token ${process.env.VUE_APP_GITHUB_TOKEN}`
-  },
+baseURL: `${process.env.VUE_APP_GITHUB_ENDPOINT}`, 
+headers: {
+  'Accept': 'application/vnd.github.v3+json',
+  'Content-Type':'application/json',
+  'Authorization': `token ${process.env.VUE_APP_GITHUB_TOKEN}`
+},
 })
-
 export default {
-  name: ' IssueList',
-  data() {
-    return {
-      issues: []
-    }
-  },
-  methods: {
-    getIssues() {
-      client.get('/issues')
-        .then((res) => {
-          this.issues = res.data;
-      })
-    },
-    // 新しく作成したmethod
-    closeIssue(number){
-      client.patch(`/issues/${number}`, // --コード2
-          {
-            state: 'closed'
-          },
-        )
-        .then(() => {
-          this.issues.some((v, i) => { // --コード3
-            if(v.number == number) this.issues.splice(i, 1); // --コード4
-          })
-      })
-    },
+name: ' IssueList',
+data() {
+  return {
+    issues: []
   }
+},
+methods: {
+  getIssues() {
+    client.get('/issues')
+      .then((res) => {
+        this.issues = res.data;
+    })
+  },
+  // 新しく作成したmethod
+  closeIssue(number){
+    client.patch(`/issues/${number}`, // --コード2
+        {
+          state: 'closed'
+        },
+      )
+      .then(() => {
+        this.issues.some((v, i) => { // --コード3
+          if(v.number == number) this.issues.splice(i, 1); // --コード4
+        })
+    })
+  },
+}
 }
 </script>
